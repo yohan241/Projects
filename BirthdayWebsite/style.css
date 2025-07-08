@@ -1,0 +1,414 @@
+
+path {
+    fill: transparent;
+}
+
+text {
+    /* Using clamp for font size to ensure it's never too small or too big */
+    font-size: clamp(1.5rem, 8vw, 3rem); /* Min 1.5rem, preferred 8vw, Max 3rem */
+    fill: #FFC107;
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: sans-serif;
+}
+
+
+.maincontainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    background: linear-gradient(41deg, rgba(200, 183, 241, 1) 1%, rgba(167, 122, 255, 1) 100%);
+    text-align: center;
+    box-sizing: border-box;
+    padding: 1vh 2vw;
+    overflow: hidden; /* Keep overflow hidden to prevent scrollbars from hue shift */
+}
+
+.headercontainer {
+    font-family: 'Fredoka', sans-serif;
+    font-size: clamp(1.2rem, 5vw, 2.5rem); /* Responsive font size for header */
+    max-width: 100%;
+    pointer-events: none;
+    overflow-wrap: break-word;
+    margin-top: 2vh; /* Add some top margin */
+    position: relative; /* Ensure it respects flow */
+}
+
+.svgWrapper {
+    width: 90vw; /* Make SVG wrapper wider on smaller screens */
+    max-width: 500px; /* Max width for larger screens */
+    height: auto; /* Maintain aspect ratio */
+}
+
+.cakecontainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+    overflow: visible; 
+    position: relative; /* Changed from absolute to relative to flow with content */
+    margin-top: 8vh; /* Adjusted margin to give more space */
+    margin-bottom: 8vh; /* Adjusted margin to give more space */
+    width: 100%; /* Take full width for centering */
+}
+
+.cakeWrapper {
+  position: relative;
+  width: 70vw; /* Slightly larger cake for mobile portrait */
+  max-width: 350px; /* Max width for larger screens */
+}
+.cakeImage {
+    width: 100%; /* Make image fill its wrapper */
+    height: auto;
+    display: block;
+}
+.cakeShadow{
+    width: 100%; /* Make shadow width relative to cakeWrapper */
+    max-width: 600px; /* Max width for larger screens */
+    height: auto;
+    position:absolute; /* Keep shadow absolute relative to cakecontainer */
+    left: 50%; /* Center shadow */
+    transform: translateX(-50%); /* Adjust for its own width */
+    bottom: -5%; /* Position shadow slightly below the cake */
+    z-index: -1; /* Place behind cake */
+}
+
+.makecontainer {
+    margin-top: auto; /* Push to bottom */
+    margin-bottom: 2vh; /* Add some bottom margin */
+    width: 90%;
+    max-width: 500px;
+    display: flex; /* Use flexbox for better layout of controls */
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5vh; /* Space between elements */
+    padding: 2vh 0; /* Add vertical padding */
+}
+
+.makecontainer h2 {
+    font-size: clamp(1.2rem, 5vw, 2rem); /* Responsive font size for heading */
+    margin-bottom: 1vh;
+}
+
+.makecontainer label {
+    font-size: clamp(0.9rem, 3.5vw, 1.2rem); /* Responsive font size for labels */
+    margin-bottom: 0.5vh;
+}
+
+.makecontainer input[type="text"] {
+    width: 80%;
+    padding: 1vh 2vw;
+    font-size: clamp(1rem, 4vw, 1.2rem);
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+.bottomrow {
+    display: flex;
+    flex-direction: column; /* Stack sliders vertically on small screens */
+    align-items: center;
+    width: 100%;
+    gap: 1.5vh; /* Space between slider groups */
+}
+
+.bottomrow label {
+    margin-top: 1vh; /* Space above each slider label */
+}
+
+.bottomrow input[type="range"] {
+    width: 80%;
+    -webkit-appearance: none; /* Remove default slider styles */
+    height: 8px;
+    background: #ddd;
+    border-radius: 5px;
+    outline: none;
+    opacity: 0.7;
+    transition: opacity .2s;
+}
+
+.bottomrow input[type="range"]:hover {
+    opacity: 1;
+}
+
+.bottomrow input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #7a4bff;
+    cursor: pointer;
+}
+
+.bottomrow input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #7a4bff;
+    cursor: pointer;
+}
+
+
+.candle {
+  position: absolute;
+  /* Adjusting position relative to cakeWrapper */
+      bottom: 98%;
+    left: 49.3%; /* Center horizontally on the cake */
+  transform: translateX(-50%); /* Adjust for its own width */
+  width: clamp(20px, 6vw, 30px); /* Responsive candle width */
+  height: clamp(40px, 12vw, 60px);
+}
+
+
+.candle.out .flame {
+  display: none;
+}
+
+.flame-wrapper {
+  position: absolute;
+  top: -10%; /* Adjusted to be slightly above the candle */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%; /* Make wrapper fill candle width */
+  height: 100%; /* Make wrapper fill candle height */
+}
+
+.flame {
+  width: 100%; /* Make flame fill its wrapper */
+  height: 100%; /* Make flame fill its wrapper */
+  background: radial-gradient(ellipse at center, rgba(255, 255, 153, 0.9) 0%, rgba(255, 153, 0, 0.9) 60%, rgba(255, 94, 0, 0.8) 100%);
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  box-shadow:
+    0 0 10px rgba(255, 200, 0, 0.7),
+    0 0 20px rgba(255, 140, 0, 0.8),
+    0 0 40px rgba(255, 100, 0, 0.7),
+    0 0 80px rgba(255, 80, 0, 0.5),
+    0 0 120px rgba(255, 50, 0, 0.3);
+  z-index: 10;
+  transform-origin: 50% 90%;
+  animation: flicker 2s ease-in-out infinite alternate;
+}
+
+@keyframes blow-wave {
+  0% {
+    transform: scale(1) skewX(0deg);
+    opacity: 1;
+  }
+  25% {
+    transform: scale(0.9) skewX(8deg);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.1) skewX(-8deg);
+    opacity: 1;
+  }
+  75% {
+    transform: scale(0.95) skewX(6deg);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1.05) skewX(-6deg);
+    opacity: 1;
+  }
+}
+
+.flame.blowing {
+  animation: blow-wave 0.3s ease-out infinite alternate;
+}
+
+@keyframes flicker {
+  0% {
+    transform: scale(1) skewX(3deg);
+    opacity: 0.95;
+    box-shadow:
+      0 0 12px rgba(255, 180, 0, 0.5),
+      0 0 30px rgba(255, 130, 0, 0.4),
+      0 0 50px rgba(255, 100, 0, 0.3),
+      0 0 70px rgba(255, 70, 0, 0.2);
+  }
+
+  25% {
+    transform: scale(1.05) skewX(-6deg);
+    opacity: 0.8;
+  }
+
+  50% {
+    transform: scale(1.1) skewX(5deg);
+    opacity: 1;
+  }
+
+  75% {
+    transform: scale(0.95) skewX(-5deg);
+    opacity: 0.9;
+  }
+
+  100% {
+    transform: scale(1.05) skewX(4deg);
+    opacity: 1;
+  }
+}
+
+/* Media Queries for larger screens (desktop/tablet portrait) */
+@media (min-width: 768px) {
+    .maincontainer {
+       /* Arrange elements in a row on larger screens */
+        justify-content: space-around;
+        align-items: center;
+        padding: 2vh 5vw;
+    }
+
+    .headercontainer {
+        margin-top: 0;
+        width: 30%; /* Smaller width for header */
+    }
+
+    .svgWrapper {
+        width: 100%; /* Fill header container */
+    }
+
+    .cakecontainer {
+        position: relative; /* Reset to relative */
+        margin-top: 0;
+        margin-bottom: 0;
+        width: 35%; /* Mid width for cake */
+    }
+
+    .cakeWrapper {
+        width: 23vw; /* Original size for larger screens */
+        max-width: 300px;
+    }
+
+    .cakeShadow {
+        width: 50vw; /* Original size for larger screens */
+        max-width: 600px;
+        bottom: 2.3vh; /* Original bottom position */
+    }
+
+    .makecontainer {
+        margin-top: 0;
+        margin-bottom: 0;
+        width: 30%; /* Smaller width for controls */
+        max-width: 400px;
+        gap: 2vh;
+    }
+
+    .bottomrow {
+        flex-direction: row;
+        justify-content: space-around;
+        gap: 1vw;
+    }
+
+    .bottomrow label {
+        margin-top: 0;
+    }
+
+    .bottomrow input[type="range"] {
+        width: 45%;
+    }
+
+    .candle {
+        bottom: 85%; /* Original position relative to cake */
+        /* Original position relative to cake */
+        transform: translate(-50%, 0);
+        width: 1.4vw; /* Original size for larger screens */
+        max-width: none;
+    }
+
+    .flame-wrapper {
+        top: -.5vw; /* Original top position */
+    }
+
+    .flame {
+        width: 1.4vw; /* Original size for larger screens */
+        height: 2.6vw; /* Original size for larger screens */
+    }
+}
+
+/* Media Query for Mobile Landscape */
+@media (max-width: 767px) and (orientation: landscape) {
+    .maincontainer {
+        flex-direction: row; /* Switch to row layout */
+        justify-content: space-around;
+        align-items: center;
+        padding: 1vh 2vw; /* Adjust padding for landscape */
+    }
+
+    .headercontainer {
+        width: 35%; /* Take up less horizontal space */
+        margin-top: 0;
+        font-size: clamp(1rem, 4vw, 2rem); /* Slightly smaller font for landscape to fit */
+    }
+
+    .svgWrapper {
+        width: 100%; /* Fill header container */
+    }
+
+    .cakecontainer {
+        margin-top: 0;
+        margin-bottom: 0;
+        width: 30%; /* Make cake smaller to fit */
+    }
+
+    .cakeWrapper {
+        width: 90%; /* Make cake fill its new smaller container */
+        max-width: 200px; /* Even smaller max-width for landscape */
+    }
+
+    .cakeShadow {
+        width: 120%; /* Keep shadow relative to cake */
+        bottom: -5%;
+    }
+
+    .candle {
+        bottom: 40%; /* Adjust candle position for smaller cake */
+        width: clamp(15px, 4vw, 25px); /* Smaller candle for landscape */
+    }
+
+    .flame-wrapper {
+        top: -5%; /* Adjust flame position */
+    }
+
+    .makecontainer {
+        margin-top: 0;
+        margin-bottom: 0;
+        width: 35%; /* Take up less horizontal space */
+        gap: 1vh; /* Reduce gap */
+        padding: 1vh 0;
+    }
+
+    .makecontainer h2 {
+        font-size: clamp(1rem, 4vw, 1.8rem); /* Smaller heading */
+    }
+
+    .makecontainer label {
+        font-size: clamp(0.8rem, 3vw, 1rem); /* Smaller labels */
+    }
+
+    .makecontainer input[type="text"] {
+        padding: 0.5vh 1vw; /* Smaller padding */
+        font-size: clamp(0.9rem, 3.5vw, 1.1rem); /* Smaller text input font */
+    }
+
+    .bottomrow {
+        flex-direction: column; /* Keep sliders vertical even in landscape if space is tight */
+        gap: 1vh;
+    }
+
+    .bottomrow input[type="range"] {
+        width: 90%; /* Make sliders wider in their column */
+    }
+}
