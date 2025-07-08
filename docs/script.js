@@ -27,15 +27,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const cakeImage = document.getElementById('cakeImage');
 
   // Optional: fallback blow button
-  const blowButton = document.createElement("button");
-  blowButton.textContent = "Blow the Candle 🎉";
-  blowButton.style.display = "none";
-  blowButton.style.marginTop = "20px";
-  blowButton.style.fontSize = "16px";
-  blowButton.style.padding = "10px 20px";
-  blowButton.id = "blowButton";
-  document.body.appendChild(blowButton);
-  blowButton.addEventListener('click', blowOutCandle);
 
   function getAverageVolume() {
     if (!analyser) return 0;
