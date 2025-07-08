@@ -1,4 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
+  const secretKey = "your-secret-passphrase"; // 🔐 Change this to something secure
+
   const candle = document.getElementById("mainCandle");
   const flame = candle.querySelector(".flame");
   const audio = new Audio('hbd.mp3');
@@ -7,18 +9,27 @@ document.addEventListener("DOMContentLoaded", function () {
   let analyser;
   let microphone;
 
-  // Threshold for detecting a "blow" to extinguish the candle
-  const blowThreshold = 90; // This value might need adjustment based on microphone sensitivity and environment
-  // Threshold for detecting "blowing" to make the flame wave
-  const waveThreshold = 40; // Lower than blowThreshold to show waving before extinguishing
+  const blowThreshold = 80;
+  const waveThreshold = 60;
+
+  const makeContainer = document.getElementById('makecontainer');
+  const linkMaker = document.getElementById('linkmaker');
+  const shareLinkInput = document.getElementById('shareLinkInput');
+  const copyLinkButton = document.getElementById('copyLinkButton');
+  const vignette = document.getElementById('vignette');
+  const textPath = document.getElementById('textPath');
+  const svgText = document.getElementById('svgText');
+  const fontSlider = document.getElementById('fontSlider');
+  const hueSlider = document.getElementById('hueShift');
+  const input = document.getElementById('textInput');
+  const body = document.body;
+  const cakeImage = document.getElementById('cakeImage');
 
   function getAverageVolume() {
-    if (!analyser) return 0; // Return 0 if analyser is not ready
-
+    if (!analyser) return 0;
     const bufferLength = analyser.frequencyBinCount;
     const dataArray = new Uint8Array(bufferLength);
     analyser.getByteFrequencyData(dataArray);
-
     let sum = 0;
     for (let i = 0; i < bufferLength; i++) {
       sum += dataArray[i];
@@ -28,17 +39,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function checkAudioLevel() {
     const averageVolume = getAverageVolume();
-
-    // If the candle is not yet out
     if (!candle.classList.contains("out")) {
-      // Apply waving effect if volume is above waveThreshold but below blowThreshold
       if (averageVolume > waveThreshold && averageVolume < blowThreshold) {
         flame.classList.add("blowing");
       } else {
         flame.classList.remove("blowing");
       }
 
-      // Extinguish candle if volume is above blowThreshold
       if (averageVolume > blowThreshold) {
         blowOutCandle();
       }
@@ -46,54 +53,119 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function blowOutCandle() {
-    // Only extinguish if the candle is not already out
     if (!candle.classList.contains("out")) {
-      candle.classList.add("out"); // Add 'out' class to hide flame
-      flame.classList.remove("blowing"); // Remove blowing animation
+      candle.classList.add("out");
+      flame.classList.remove("blowing");
       triggerConfetti();
       endlessConfetti();
-      audio.play(); // Play birthday song
+      audio.play();
+      if (!vignette.classList.contains('hidden')) {
+        vignette.classList.add('hidden');
+      }
+
+      if (decryptedText) {
+        textPath.textContent = decryptedText;
+      }
     }
   }
 
-  // Microphone setup
+  function triggerConfetti() {
+    confetti({ particleCount: 100, spread: 70, origin: { y: 0.42 } });
+  }
+
+  function endlessConfetti() {
+    setInterval(() => {
+      confetti({ particleCount: 400, spread: 300, origin: { y: 0 } });
+    }, 1000);
+  }
+
+  function applyCustomizations(text, fontSize, hueShift) {
+    textPath.textContent = text || " ";
+    svgText.style.fontSize = `${fontSize}px`;
+    body.style.filter = `hue-rotate(${hueShift}deg)`;
+    cakeImage.style.filter = `hue-rotate(${hueShift}deg)`;
+  }
+
+  function generateShareLink() {
+    const originalText = input.value || "Happiest Birthday To You!";
+    const encrypted = CryptoJS.AES.encrypt(originalText, secretKey).toString();
+    const safeEncrypted = encodeURIComponent(encrypted);
+    const currentFontSize = fontSlider.value;
+    const currentHueShift = hueSlider.value;
+    const baseUrl = window.location.origin + window.location.pathname;
+    return `${baseUrl}?text=${safeEncrypted}&fontSize=${currentFontSize}&hueShift=${currentHueShift}`;
+  }
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const paramText = urlParams.get('text');
+  const paramFontSize = urlParams.get('fontSize');
+  const paramHueShift = urlParams.get('hueShift');
+
+  let decryptedText = null;
+
+  if (paramText && paramFontSize && paramHueShift) {
+    makeContainer.classList.add('hidden');
+    linkMaker.classList.add('hidden');
+    vignette.classList.remove('hidden');
+
+    try {
+      const bytes = CryptoJS.AES.decrypt(decodeURIComponent(paramText), secretKey);
+      decryptedText = bytes.toString(CryptoJS.enc.Utf8);
+      applyCustomizations("Blow the candle!", paramFontSize, paramHueShift);
+      textPath.textContent = "Blow the candle!";
+    } catch (e) {
+      console.error("Failed to decrypt text:", e);
+      textPath.textContent = "Error loading message!";
+    }
+
+  } else {
+    makeContainer.classList.remove('hidden');
+    linkMaker.classList.remove('hidden');
+    vignette.classList.add('hidden');
+
+    input.value = textPath.textContent;
+    applyCustomizations(input.value, fontSlider.value, hueSlider.value);
+    shareLinkInput.value = generateShareLink();
+
+    input.addEventListener('input', () => {
+      applyCustomizations(input.value, fontSlider.value, hueSlider.value);
+      shareLinkInput.value = generateShareLink();
+    });
+
+    fontSlider.addEventListener('input', () => {
+      applyCustomizations(input.value, fontSlider.value, hueSlider.value);
+      shareLinkInput.value = generateShareLink();
+    });
+
+    hueSlider.addEventListener('input', () => {
+      applyCustomizations(input.value, fontSlider.value, hueSlider.value);
+      shareLinkInput.value = generateShareLink();
+    });
+
+    copyLinkButton.addEventListener('click', () => {
+      shareLinkInput.select();
+      document.execCommand('copy');
+      copyLinkButton.textContent = 'Copied!';
+      setTimeout(() => {
+        copyLinkButton.textContent = 'Copy Link';
+      }, 2000);
+    });
+  }
+
   if (navigator.mediaDevices.getUserMedia) {
     navigator.mediaDevices.getUserMedia({ audio: true })
-      .then(function (stream) {
+      .then(stream => {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
         analyser = audioContext.createAnalyser();
         microphone = audioContext.createMediaStreamSource(stream);
         microphone.connect(analyser);
-        analyser.fftSize = 256; // Smaller FFT size for quicker response
-
-        // Continuously check audio level for waving and extinguishing
-        setInterval(checkAudioLevel, 100); // Check more frequently for smoother waving effect
+        analyser.fftSize = 256;
+        setInterval(checkAudioLevel, 100);
       })
-      .catch(function (err) {
+      .catch(err => {
         console.log("Unable to access microphone: " + err);
-        // Optionally, display a message to the user if microphone access is denied
       });
   } else {
     console.log("getUserMedia not supported on your browser!");
-    // Optionally, display a message to the user that microphone is required
   }
 });
-
-// Confetti functions (unchanged)
-function triggerConfetti() {
-  confetti({
-    particleCount: 100,
-    spread: 70,
-    origin: { y: 0.42 }
-  });
-}
-
-function endlessConfetti() {
-  setInterval(function () {
-    confetti({
-      particleCount: 400,
-      spread: 300,
-      origin: { y: 0 }
-    });
-  }, 1000);
-}

@@ -8,17 +8,21 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="style.css">
-        <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
 
+        <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
+        
     </head>
     <body>
        <div class="maincontainer">
+            <!-- Vignette overlay -->
+            <div class="vignette" id="vignette"></div>
+            
             <div class="headercontainer svgWrapper">
                 <svg viewBox="0 0 500 200" preserveAspectRatio="xMidYMid meet">
                 <path id="curve" d="M20,120 Q250,0 480,120" />
                 <text width="500" text-anchor="middle" class="text" id="svgText">
                 <textPath id = "textPath" xlink:href="#curve" startOffset="50%">
-                    Create Your Own Greeting!
+                Create Your Own Greeting!
                 </textPath>
                 </text>
                 </svg>
@@ -40,11 +44,10 @@
                 </div>
                 </div>
 
+            <div class="disappear" id="disappear">
+            
 
-            <div class="linkmaker">
-                
-            </div>
-            <div class="makecontainer">
+            <div class="makecontainer" id="makecontainer">
                 <h2>Customize your Greeting!</h2>
                 <label for="textInput">Birthday Greeting!</label>
                 <input type="text" id="textInput" required maxlength="80" placeholder="Type your text here..." />
@@ -55,38 +58,102 @@
                 <input type="range" id="hueShift" min="0" max="360" value="0">
                 </div>
             </div>
+            <div class="linkmaker" id="linkmaker">
+                <h2>Share your Greeting!</h2>
+                <input type="text" id="shareLinkInput" readonly />
+                <button id="copyLinkButton">Copy Link</button>
+            </div>
        </div>
+       </div>
+       <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
         <script>
             const input = document.getElementById('textInput');
             const textPath = document.getElementById('textPath');
-            const svgText = document.getElementById('svgText'); // Get the SVG text element
+            const svgText = document.getElementById('svgText');
             const fontSlider = document.getElementById('fontSlider');
             const hueSlider = document.getElementById('hueShift');
-            const body = document.body; // Get the body element for background hue shift
-            const cakeImage = document.getElementById('cakeImage'); // Get the cake image element
+            const body = document.body;
+            const cakeImage = document.getElementById('cakeImage');
+            const makeContainer = document.getElementById('makecontainer');
+            const linkMaker = document.getElementById('linkmaker');
+            const shareLinkInput = document.getElementById('shareLinkInput');
+            const copyLinkButton = document.getElementById('copyLinkButton');
+            const vignette = document.getElementById('vignette');
 
-            // Event listener for text input
+            // Function to update the SVG text, font size, and hue shift
+            function applyCustomizations(text, fontSize, hueShift) {
+                textPath.textContent = text || " ";
+                svgText.style.fontSize = `${fontSize}px`;
+                body.style.filter = `hue-rotate(${hueShift}deg)`;
+                cakeImage.style.filter = `hue-rotate(${hueShift}deg)`;
+            }
+
+            // Function to generate the shareable URL
+            function generateShareLink() {
+                const currentText = encodeURIComponent(input.value || "Happiest Birthday To You!");
+                const currentFontSize = fontSlider.value;
+                const currentHueShift = hueSlider.value;
+                const baseUrl = window.location.origin + window.location.pathname;
+                return `${baseUrl}?text=${currentText}&fontSize=${currentFontSize}&hueShift=${currentHueShift}`;
+            }
+
+            // Event listeners for customization inputs
             input.addEventListener('input', () => {
-                textPath.textContent = input.value || " "; // Avoid empty textPath bug
+                applyCustomizations(input.value, fontSlider.value, hueSlider.value);
+                shareLinkInput.value = generateShareLink();
             });
 
-            // Event listener for font size slider
             fontSlider.addEventListener('input', () => {
-                svgText.style.fontSize = `${fontSlider.value}px`; // Apply font size to SVG text
+                applyCustomizations(input.value, fontSlider.value, hueSlider.value);
+                shareLinkInput.value = generateShareLink();
             });
 
-            // Event listener for hue shift slider
             hueSlider.addEventListener('input', () => {
-                const hueValue = hueSlider.value;
-                body.style.filter = `hue-rotate(${hueValue}deg)`; // Apply hue shift to body background
-                cakeImage.style.filter = `hue-rotate(${hueValue}deg)`; // Apply hue shift to cake image
+                applyCustomizations(input.value, fontSlider.value, hueSlider.value);
+                shareLinkInput.value = generateShareLink();
             });
 
-            // Set initial font size and hue shift based on slider values
-            svgText.style.fontSize = `${fontSlider.value}px`;
-            body.style.filter = `hue-rotate(${hueSlider.value}deg)`;
-            cakeImage.style.filter = `hue-rotate(${hueSlider.value}deg)`;
+            // Copy link functionality
+            copyLinkButton.addEventListener('click', () => {
+                shareLinkInput.select();
+                document.execCommand('copy');
+                // Optional: Provide visual feedback that link is copied
+                copyLinkButton.textContent = 'Copied!';
+                setTimeout(() => {
+                    copyLinkButton.textContent = 'Copy Link';
+                }, 2000);
+            });
 
+            // Check for URL parameters on page load
+            const urlParams = new URLSearchParams(window.location.search);
+            const paramText = urlParams.get('text');
+            const paramFontSize = urlParams.get('fontSize');
+            const paramHueShift = urlParams.get('hueShift');
+
+            if (paramText && paramFontSize && paramHueShift) {
+                // Scenario 1: URL parameters exist (receiving a greeting)
+                makeContainer.classList.add('hidden'); // Hide customization controls
+                linkMaker.classList.add('hidden'); // Hide link maker
+                vignette.classList.remove('hidden'); // Show vignette
+
+                applyCustomizations(decodeURIComponent(paramText), paramFontSize, paramHueShift);
+                textPath.textContent = "Blow the candle!"; // Change text to instruction
+                
+            } else {
+                // Scenario 2: No URL parameters (creating a greeting)
+                makeContainer.classList.remove('hidden'); // Show customization controls
+                linkMaker.classList.remove('hidden'); // Show link maker
+                vignette.classList.add('hidden'); // Hide vignette
+
+                // Set initial values for customization based on current defaults
+                input.value = textPath.textContent;
+                svgText.style.fontSize = `${fontSlider.value}px`;
+                body.style.filter = `hue-rotate(${hueSlider.value}deg)`;
+                cakeImage.style.filter = `hue-rotate(${hueSlider.value}deg)`;
+
+                shareLinkInput.value = generateShareLink(); // Generate initial link
+            }
         </script>
         <script src="script.js" async defer></script>
             <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.3.2"></script>

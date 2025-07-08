@@ -15,12 +15,17 @@ html, body {
     margin: 0;
     padding: 0;
 }
+.disappear{
+    display: flex;
+    justify-content: space-evenly;
+}
 
 body {
     display: flex;
     justify-content: center;
     align-items: center;
     font-family: sans-serif;
+    background: linear-gradient(41deg, rgba(200, 183, 241, 1) 1%, rgba(167, 122, 255, 1) 100%);
 }
 
 
@@ -35,8 +40,28 @@ body {
     text-align: center;
     box-sizing: border-box;
     padding: 1vh 2vw;
-    overflow: hidden; /* Keep overflow hidden to prevent scrollbars from hue shift */
+    /* overflow: hidden; /* Removed overflow hidden to allow potential scrolling if content exceeds viewport */
 }
+
+/* Vignette Overlay */
+.vignette {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(ellipse at center, transparent 0%, transparent 40%, rgba(0,0,0,0.8) 100%);
+    z-index: 99; /* Ensure it's above most content */
+    pointer-events: none; /* Allow clicks to pass through */
+    opacity: 1; /* Default visible, will be controlled by JS */
+    transition: opacity 0.5s ease-out;
+}
+
+.vignette.hidden {
+    opacity: 0;
+    pointer-events: none; /* Ensure it doesn't block events when hidden */
+}
+
 
 .headercontainer {
     font-family: 'Fredoka', sans-serif;
@@ -96,8 +121,54 @@ body {
     flex-direction: column;
     align-items: center;
     gap: 1.5vh; /* Space between elements */
-    padding: 2vh 0; /* Add vertical padding */
+   /* Add vertical padding */
 }
+
+/* Link Maker Section */
+.linkmaker {
+    margin-top: auto; /* Push to bottom, similar to makecontainer */
+    margin-bottom: 2vh;
+    width: 90%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5vh;
+
+}
+
+.linkmaker h2 {
+    font-size: clamp(1.2rem, 5vw, 2rem);
+
+
+}
+
+.linkmaker input[type="text"] {
+    width: 80%;
+    padding: 1vh 2vw;
+    font-size: clamp(0.9rem, 3.5vw, 1.1rem);
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.8);
+    color: #333;
+}
+
+.linkmaker button {
+    padding: 1vh 3vw;
+    font-size: clamp(1rem, 4vw, 1.2rem);
+    background: #7a4bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.linkmaker button:hover {
+    background: #6a3be0;
+}
+
 
 .makecontainer h2 {
     font-size: clamp(1.2rem, 5vw, 2rem); /* Responsive font size for heading */
@@ -262,10 +333,15 @@ body {
   }
 }
 
+/* Helper class to hide elements */
+.hidden {
+    display: none !important;
+}
+
 /* Media Queries for larger screens (desktop/tablet portrait) */
 @media (min-width: 768px) {
     .maincontainer {
-       /* Arrange elements in a row on larger screens */
+
         justify-content: space-around;
         align-items: center;
         padding: 2vh 5vw;
@@ -274,6 +350,7 @@ body {
     .headercontainer {
         margin-top: 0;
         width: 30%; /* Smaller width for header */
+        
     }
 
     .svgWrapper {
@@ -285,6 +362,7 @@ body {
         margin-top: 0;
         margin-bottom: 0;
         width: 35%; /* Mid width for cake */
+       
     }
 
     .cakeWrapper {
@@ -298,12 +376,13 @@ body {
         bottom: 2.3vh; /* Original bottom position */
     }
 
-    .makecontainer {
+    .makecontainer, .linkmaker { /* Apply to both containers */
         margin-top: 0;
         margin-bottom: 0;
         width: 30%; /* Smaller width for controls */
         max-width: 400px;
         gap: 2vh;
+                flex: 1;
     }
 
     .bottomrow {
@@ -325,6 +404,7 @@ body {
         /* Original position relative to cake */
         transform: translate(-50%, 0);
         width: 1.4vw; /* Original size for larger screens */
+
         max-width: none;
     }
 
@@ -335,6 +415,10 @@ body {
     .flame {
         width: 1.4vw; /* Original size for larger screens */
         height: 2.6vw; /* Original size for larger screens */
+    }
+    .disappear{
+        position: relative;
+        right: 1vw;
     }
 }
 
@@ -382,7 +466,7 @@ body {
         top: -5%; /* Adjust flame position */
     }
 
-    .makecontainer {
+    .makecontainer, .linkmaker { /* Apply to both containers */
         margin-top: 0;
         margin-bottom: 0;
         width: 35%; /* Take up less horizontal space */
@@ -390,7 +474,7 @@ body {
         padding: 1vh 0;
     }
 
-    .makecontainer h2 {
+    .makecontainer h2, .linkmaker h2 {
         font-size: clamp(1rem, 4vw, 1.8rem); /* Smaller heading */
     }
 
@@ -398,7 +482,7 @@ body {
         font-size: clamp(0.8rem, 3vw, 1rem); /* Smaller labels */
     }
 
-    .makecontainer input[type="text"] {
+    .makecontainer input[type="text"], .linkmaker input[type="text"] {
         padding: 0.5vh 1vw; /* Smaller padding */
         font-size: clamp(0.9rem, 3.5vw, 1.1rem); /* Smaller text input font */
     }
