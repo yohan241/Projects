@@ -1,5 +1,9 @@
 document.addEventListener("DOMContentLoaded", function () {
-  const secretKey = "your-secret-passphrase"; // 🔐 Change this to something secure
+  const secretKey = "your-secret-passphrase"; // Change to a secure passphrase
+
+  const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+  const blowThreshold = isMobile ? 30 : 80;
+  const waveThreshold = isMobile ? 20 : 60;
 
   const candle = document.getElementById("mainCandle");
   const flame = candle.querySelector(".flame");
@@ -8,9 +12,6 @@ document.addEventListener("DOMContentLoaded", function () {
   let audioContext;
   let analyser;
   let microphone;
-
-  const blowThreshold = 80;
-  const waveThreshold = 60;
 
   const makeContainer = document.getElementById('makecontainer');
   const linkMaker = document.getElementById('linkmaker');
@@ -24,6 +25,17 @@ document.addEventListener("DOMContentLoaded", function () {
   const input = document.getElementById('textInput');
   const body = document.body;
   const cakeImage = document.getElementById('cakeImage');
+
+  // Optional: fallback blow button
+  const blowButton = document.createElement("button");
+  blowButton.textContent = "Blow the Candle 🎉";
+  blowButton.style.display = "none";
+  blowButton.style.marginTop = "20px";
+  blowButton.style.fontSize = "16px";
+  blowButton.style.padding = "10px 20px";
+  blowButton.id = "blowButton";
+  document.body.appendChild(blowButton);
+  blowButton.addEventListener('click', blowOutCandle);
 
   function getAverageVolume() {
     if (!analyser) return 0;
@@ -59,6 +71,7 @@ document.addEventListener("DOMContentLoaded", function () {
       triggerConfetti();
       endlessConfetti();
       audio.play();
+
       if (!vignette.classList.contains('hidden')) {
         vignette.classList.add('hidden');
       }
@@ -66,6 +79,8 @@ document.addEventListener("DOMContentLoaded", function () {
       if (decryptedText) {
         textPath.textContent = decryptedText;
       }
+
+      blowButton.style.display = "none"; // Hide fallback after used
     }
   }
 
@@ -118,6 +133,13 @@ document.addEventListener("DOMContentLoaded", function () {
       textPath.textContent = "Error loading message!";
     }
 
+    // Show fallback on mobile
+    if (isMobile) {
+      setTimeout(() => {
+        blowButton.style.display = "block";
+      }, 3000); // Give user a few seconds to try blowing
+    }
+
   } else {
     makeContainer.classList.remove('hidden');
     linkMaker.classList.remove('hidden');
@@ -152,6 +174,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  // Mic setup
   if (navigator.mediaDevices.getUserMedia) {
     navigator.mediaDevices.getUserMedia({ audio: true })
       .then(stream => {
@@ -164,8 +187,14 @@ document.addEventListener("DOMContentLoaded", function () {
       })
       .catch(err => {
         console.log("Unable to access microphone: " + err);
+        if (isMobile) {
+          blowButton.style.display = "block"; // fallback if mic denied
+        }
       });
   } else {
-    console.log("getUserMedia not supported on your browser!");
+    console.log("getUserMedia not supported!");
+    if (isMobile) {
+      blowButton.style.display = "block";
+    }
   }
 });
